@@ -1,133 +1,108 @@
-C:\Users\VASANT PATIL homeuse\.dbclient\storage\1788316269271@@127.0.0.1@3306 old adress
-CREATE DATABASE DB_D1374;
+show DATABASES;
+use ola;
 
+#1. Retrieve all successful bookings:
+Create View Successful_Bookings As
+SELECT * FROM bookings
+WHERE Booking_Status = 'Success';
 
-use DB_D1374;
-
-create table tbl_country(country_id numeric(5),country_name varchar(50));
-create table tbl_state(state_id int,state_name varchar(50),country_id numeric(5));
-
-desc tbl_state;
-alter table tbl_state rename column state_id to st_rank;
-
-ALTER TABLE tbl_state MODIFY COLUMN st_rank NUMERIC(2);
-
-ALTER TABLE tbl_state MODIFY COLUMN st_rank NUMERIC(3);
-
-alter table tbl_state drop COLUMN state_id;
-
-drop table state;
-
-
-
-tbl_country
-tbl_state
-tbl_city
-tbl_employee
-
-
-
-DDL[Data Definition Language]->    CREATE, ALTER, DROP, TRUNCATE, DESC
-DML[Data Manipulation Language] -> INSERT, UPDATE, DELETE 
-DCL[Data control Language]      -> GRANT, REVOKE
-TCL[Transaction Control Language]-> COMMIT, ROLLBACK, SAVEPOINT
-DQL[Data Query Language] -> SELECT
+#1. Retrieve all successful bookings:
+Select * From Successful_Bookings;
 
 
 
 
-CREATE DATABASE DB_D1374;
+#2. Find the average ride distance for each vehicle type:
+Create View ride_distance_for_each_vehicle As
+SELECT Vehicle_Type, AVG(Ride_Distance)
+as avg_distance FROM bookings
+GROUP BY Vehicle_Type;
 
-USE DB_D1374;
-
-CREATE TABLE TBL_COUNTRY
-(
-  COUNTRY_ID  NUMERIC(5),
-  COUNTRY_NAME VARCHAR(50)
-);
-
-CREATE TABLE TBL_STATE
-(
-  STATE_ID INT,
-  STATE_NAME VARCHAR(50),
-  COUNTRY_ID NUMERIC(5) 
-
-);
-
-DESC TBL_STATE;
-ALTER TABLE TBL_STATE RENAME COLUMN STATE_RANK TO ST_RANK;
-
-ALTER TABLE TBL_STATE ADD STATE_RANK NUMERIC(2);
-
-ALTER TABLE TBL_STATE MODIFY STATE_RANK NUMERIC(3);
-
-DROP TABLE TBL_STATE;
-
-ALTER TABLE TBL_STATE DROP COLUMN ST_RANK;
+#2. Find the average ride distance for each vehicle type:
+Select * from ride_distance_for_each_vehicle;
 
 
 
+#3. Get the total number of cancelled rides by customers:
+Create View Canceled_rides_by_customers As
+SELECT COUNT(*) FROM bookings
+WHERE Booking_Status = 'cancelled by Customer';
+
+#3. Get the total number of cancelled rides by customers:
+Select * from Canceled_rides_by_customers;
+
+
+#4. List the top 5 customers who booked the highest number of rides:
+Create View Top_5_Customers As
+SELECT Customer_ID, COUNT(Booking_ID) as total_rides
+FROM bookings
+GROUP BY Customer_ID
+ORDER BY total_rides DESC LIMIT 5;
+
+#4. List the top 5 customers who booked the highest number of rides:
+Select * from Top_5_Customers;
 
 
 
+#5. Get the number of rides cancelled by drivers due to personal and car-related issues:
+USE OLA;
+CREATE VIEW Rides_cancelled_by_Drivers_P_C_Issues AS 
+SELECT COUNT(*) 
+FROM bookings 
+WHERE Canceled_Rides_by_Driver = 'Personal & Car related issue';
 
-day 2
-
-CREATE TABLE TBL_COUNTRY
-(
-  COUNTRY_ID  NUMERIC(5) primary key,
-  COUNTRY_NAME VARCHAR(50)
-);
-
-insert into tbl_country values(101,'INDIA'),(102,'AMERICA');
-SELECT * FROM tbl_country;
-
-DELETE FROM tbl_country WHERE COUNTRY_ID = 101;
+#5. Get the number of rides cancelled by drivers due to personal and car-related issues:
+Select * from Rides_cancelled_by_Drivers_P_C_Issues;
 
 
 
-desc tbl_country;
+#6. Find the maximum and minimum driver ratings for Prime Sedan bookings:
+USE OLA;
+Create View Max_Min_Driver_Rating As
+SELECT MAX(Driver_Ratings) as max_rating,
+MIN(Driver_Ratings) as min_rating
+FROM bookings WHERE Vehicle_Type = 'Prime Sedan';
 
-drop table tbl_country;
-
-CREATE TABLE TBL_STATE
-(
-  STATE_ID INT primary key,
-  STATE_NAME VARCHAR(50),
-  COUNTRY_ID NUMERIC(5)  references tbl_country(COUNTRY_ID) 
-  #foreign key(COUNTRY_ID) references tbl_country(COUNTRY_ID)
-);
-
-SELECT * FROM tbl_state;
-
-INSERT INTO tbl_state VALUES(1001,'MAHARASTRA',101),(1002,'GUJRAT',101),(1003,'CALIFORNIA',102),
-(1004, 'LOS ANGELES', 102),(1005,'COLAMBO',NULL);
-
-drop table tbl_state;
+#6. Find the maximum and minimum driver ratings for Prime Sedan bookings:
+Select * from Max_Min_Driver_Rating;
 
 
 
-day 3
-SELECT * FROM TAB;
+#7. Retrieve all rides where payment was made using UPI:
+Create View UPI_Payment As
+SELECT * FROM bookings
+WHERE Payment_Method = 'UPI';
 
-SELECT * FROM REGIONS;
-SELECT * FROM COUNTRIES;
-SELECT * FROM LOCATIONS;
-SELECT * FROM DEPARTMENTS;
-
-
-SELECT REGION_NAME, COUNTRY_NAME
-FROM REGIONS R 
-JOIN COUNTRIES C
-ON R.REGION_ID = C.REGION_ID
-ORDER BY REGION_NAME
+#7. Retrieve all rides where payment was made using UPI:
+Select * from UPI_Payment;
 
 
-SELECT REGION_NAME, COUNT(COUNTRY_NAME) AS "TOTAL COUNTRIES"
-FROM REGIONS R 
-JOIN COUNTRIES C
-ON R.REGION_ID = C.REGION_ID
---WHERE REGION_NAME IN ('Americas','Europe')  
-GROUP BY REGION_NAME
-HAVING REGION_NAME IN ('Americas','Europe')
-ORDER BY REGION_NAME
+#8. Find the average customer rating per vehicle type:
+Create View AVG_Cust_Rating As
+SELECT Vehicle_Type, AVG(Customer_Rating) as avg_customer_rating
+FROM bookings
+GROUP BY Vehicle_Type;
+
+#8. Find the average customer rating per vehicle type:
+Select * from AVG_Cust_Rating;
+
+
+
+#9. Calculate the total booking value of rides completed successfully:
+Create View total_successful_ride_value As
+SELECT SUM(Booking_Value) as total_successful_ride_value
+FROM bookings
+WHERE Booking_Status = 'Success';
+
+#9. Calculate the total booking value of rides completed successfully:
+Select * from total_successful_ride_value;
+
+
+#10. List all incomplete rides along with the reason:
+Create View Incomplete_Rides_Reason As
+SELECT Booking_ID, Incomplete_Rides_Reason
+FROM bookings
+WHERE Incomplete_Rides = 'Yes';
+
+#10. List all incomplete rides along with the reason:
+Select * from Incomplete_Rides_Reason;
